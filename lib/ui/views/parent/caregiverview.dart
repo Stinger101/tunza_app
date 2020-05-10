@@ -119,7 +119,7 @@ class CaregiverView extends StatelessWidget{
                                                   String url=DateTime.now().toIso8601String();
                                                   await _toggleChannel(url,model.caregiverList[i].caregiver_user_id);
                                                   await model.makeCall(
-                                                      "video call url",
+                                                      url,
                                                       model.caregiverList[i].caregiver_user_id,
                                                       "video");
 

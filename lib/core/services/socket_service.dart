@@ -73,7 +73,8 @@ class SocketService{
       var call=json.decode(x.data)["call"];
       callController.add(Call.fromJson(call));
       print(call);
-      _notificationService.showNotification(call["id"], call['call_type'], call['call_type'], call['call_url']);
+      Call rec_call=Call.fromJson(call);
+      _notificationService.showNotification(call["id"], call['call_type'], call['call_type'],rec_call.call_url+"!"+rec_call.receiver_id );
     });
   }
 
