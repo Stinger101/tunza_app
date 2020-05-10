@@ -390,7 +390,8 @@ class Api{
       return false;
     }
   }
-  Future<bool> addComment(child_id,topic_id,comment)async{
+  Future<bool> addComment(topic_id,child_id,comment)async{
+    print(topic_id);
     AuthenticationService _authenticationService=locator<AuthenticationService>();
     var res = await client.post("$url/user/child/$child_id/topic/$topic_id/add_comment",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"},
@@ -404,6 +405,7 @@ class Api{
     }
   }
   Future<bool> editComment(comment_id,topic_id,child_id,comment)async{
+    print(topic_id);
     AuthenticationService _authenticationService=locator<AuthenticationService>();
     var res = await client.post("$url/user/child/$child_id/topic/$topic_id/comment/$comment_id/update",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"},

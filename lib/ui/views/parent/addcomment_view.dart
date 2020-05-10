@@ -26,7 +26,7 @@ class AddCommentView extends StatelessWidget{
       builder: (context,model,child){
         return Scaffold(
           appBar: AppBar(
-            title: Text(this.comment!=null?"Add a comment-":"Edit comment"+this.child.child_name),
+            title: Text(this.comment==null?"Add a comment-":"Edit comment-"+this.child.child_name),
           ),
           body: Container(
             padding: EdgeInsets.fromLTRB(4, 6, 4, 4),
@@ -103,6 +103,7 @@ class AddCommentView extends StatelessWidget{
                       onPressed: ()async{
                         if(_formKey.currentState.validate()){
                           _formKey.currentState.save();
+                          print(this.comment);
                           var success = this.comment!=null ? await model.editComment(this.comment.id,this.post.id,this.child.child_id, _question)
                               :await model.addComment(this.post.id,this.child.child_id, _question);//todo: use model to post
                           if(success){
