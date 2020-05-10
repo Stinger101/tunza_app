@@ -10,7 +10,8 @@ import 'package:tunza_app/locator.dart';
 class BaseView<T extends BaseModel> extends StatefulWidget{
   final Widget Function(BuildContext context,T model, Widget child) builder;
   final Function(T) onModelReady;
-  BaseView({this.builder,this.onModelReady});
+  final Function() dispose;
+  BaseView({this.builder,this.onModelReady,this.dispose});
   @override
   _BaseViewState<T> createState()=>_BaseViewState<T>();
 }
@@ -63,7 +64,7 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>>{
   void _configureSelectNotificationSubject() {
 
     asns= model.notificationService.selectNotificationSubject.stream.listen((String payload) async {
-      await Navigator.pushNamed(context, "profile");//todo: replace this with call page
+      await Navigator.pushNamed(context, "videocall_view",arguments: payload);//todo: replace this with call page
     });
   }
   @override
@@ -71,6 +72,8 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>>{
 //    model.notificationService.didReceiveLocalNotificationSubject.close();
 //    model.notificationService.selectNotificationSubject.close();
     asns.cancel();
+    widget.dispose!=null?
+    widget.dispose:null;
     super.dispose();
   }
 
