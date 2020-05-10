@@ -18,6 +18,7 @@ import 'package:tunza_app/ui/views/parent/invitecaretakerview.dart';
 import 'package:tunza_app/ui/views/auth/loginview.dart';
 import 'package:tunza_app/ui/views/auth/profilepage.dart';
 import 'package:tunza_app/ui/views/parent/singlechildview.dart';
+import 'package:tunza_app/ui/views/parent/videocall_view.dart';
 const String initialRoute="login";
 class Router{
   static Route<dynamic> generateRoute(RouteSettings settings){
@@ -75,6 +76,9 @@ class Router{
         break;
       case "caregiver_child_view":
         return MaterialPageRoute(builder: (_)=>CaregiverSingleChildView(settings.arguments));
+        break;
+      case "videocall_view":
+        return MaterialPageRoute(builder: (_)=>VideoCallView());
         break;
 
     }
