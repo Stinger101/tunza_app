@@ -78,7 +78,7 @@ class Router{
         return MaterialPageRoute(builder: (_)=>CaregiverSingleChildView(settings.arguments));
         break;
       case "videocall_view":
-        return MaterialPageRoute(builder: (_)=>VideoCallView());
+        return MaterialPageRoute(builder: (_)=>VideoCallView(settings.arguments));
         break;
 
     }

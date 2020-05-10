@@ -11,8 +11,12 @@ import 'package:tunza_app/ui/views/parent/caregiverview.dart';
 
 class VideoCallView extends StatelessWidget{
 
-  Call call;
-  VideoCallView();
+  String call_url;
+  String receiver_id;
+  VideoCallView(String arg){
+    this.call_url=arg.split("!")[0];
+    this.receiver_id=arg.split("!")[1];
+  }
   CaregiverModel model;
 
 
@@ -27,10 +31,9 @@ class VideoCallView extends StatelessWidget{
     return BaseView<CaregiverModel>(
       onModelReady: (model)async{
         this.model=model;
-        call=await model.socketService.callController.stream.first;
         _initAgoraRtcEngine();
         _addAgoraEventHandlers();
-        _toggleChannel(call.call_url, call.receiver_id);
+        _toggleChannel(call_url, receiver_id);
 
       },
       builder: (context,model,child){
@@ -66,7 +69,7 @@ class VideoCallView extends StatelessWidget{
     AgoraRtcEngine.enableAudio();
      AgoraRtcEngine.setParameters('{\"che.video.lowBitRateStreamParameter\":{\"width\":320,\"height\":180,\"frameRate\":15,\"bitRate\":140}}');
     AgoraRtcEngine.setChannelProfile(ChannelProfile.Communication);
-    AgoraRtcEngine.setParameters("{\"rtc.log_filter\": 65535}");
+//    AgoraRtcEngine.setParameters("{\"rtc.log_filter\": 65535}");
 
     VideoEncoderConfiguration config = VideoEncoderConfiguration();
     config.orientationMode = VideoOutputOrientationMode.FixedPortrait;
