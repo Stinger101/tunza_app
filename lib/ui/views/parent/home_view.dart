@@ -111,14 +111,6 @@ class _HomeViewState extends State<HomeView>{
           Center(
             child: CircularProgressIndicator(),
           )
-          :model.current_call!=null?
-          Center(
-            child: IconButton(icon: Icon(Icons.phone,size: 48,),onPressed: (){
-              setState(() {
-                model.current_call=null;
-              });
-            },),
-          )
           :RefreshIndicator(
             child: model.childList.length>0?
             ListView.builder(itemCount:model.childList.length ,itemBuilder: (context,i){
