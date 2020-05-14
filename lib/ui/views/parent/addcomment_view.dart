@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/models/post.dart';
 import 'package:tunza_app/core/models/comment.dart';
 import 'package:tunza_app/core/viewmodels/communication/addcomment_model.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
+import 'package:tunza_app/ui/views/parent/singlepostview.dart';
 
 class AddCommentView extends StatelessWidget{
   Child child;
   Post post;
   Comment comment;
+  Role role;
   var _formKey=GlobalKey<FormState>();
   var _question;
   var _visibility = true;
@@ -18,6 +21,7 @@ class AddCommentView extends StatelessWidget{
     this.child=args[0];
     this.post=args[1];
     this.comment=args.length>2?args[2]:null;
+    this.role=args.length>3?args[3]:Role.Parent;
   }
   @override
   Widget build(BuildContext context) {
@@ -108,7 +112,7 @@ class AddCommentView extends StatelessWidget{
                               :await model.addComment(this.post.id,this.child.child_id, _question);//todo: use model to post
                           if(success){
                             Navigator.of(context).pop();
-                            Navigator.pushReplacementNamed(context, "communication",arguments:this.child);
+                            Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => SinglePostView([this.child,this.post,this.role])));
                           }
                         }
                       },

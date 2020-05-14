@@ -1,27 +1,15 @@
 import 'dart:async';
 
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
-
-void main(){
-  runApp(MyApp());
-}
-
-class  MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Lets Call',
-      theme: ThemeData(
-          primarySwatch: Colors.blueGrey
-      ),
-      home: VoiceCallPage() ,
-
-    );
-  }
-}
+import 'package:tunza_app/res/strings.dart';
 
 class VoiceCallPage extends StatefulWidget {
+  final String call_url;
+  final int receiver_id;
+  final String mode;//receiving or calling
 
+  VoiceCallPage(this.call_url,this.receiver_id,this.mode);
   @override
   _VoiceCallPageState createState() => _VoiceCallPageState();
 }
@@ -31,6 +19,9 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
   Timer _timerInstance;
   int _start = 0;
   String _timer = '';
+  final infoStrings=<String>[];
+  final remoteUsers = <int>[];
+  bool isInChannel = false;
 
   void startTimer(){
     var onSec = Duration(seconds: 1);
@@ -63,6 +54,9 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
 
   void initState(){
     super.initState();
+    _initAgoraRtcEngine();
+    _addAgoraEventHandlers();
+    _toggleChannel(widget.call_url, widget.receiver_id);
     startTimer();
   }
 
@@ -71,7 +65,10 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
     var clipRRect = ClipRRect(
       borderRadius: BorderRadius.circular(200.0),
       child: Image.network(
-        'https://avatars0.githubusercontent.com/u/1515991?s=400&u=992d9ed72113954c22d87d6185064027bc600c51&v=4',),
+        'https://avatars0.githubusercontent.com/u/1515991?s=400&u=992d9ed72113954c22d87d6185064027bc600c51&v=4',
+        height: 100,
+        width: 100,
+      ),
     );
     return SafeArea(
       child: Container(
@@ -123,14 +120,18 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
               ],
             ),
             SizedBox(
-              height:70.0,
+              height:50.0,
             ),
             FloatingActionButton(
-              onPressed: (){},
+              onPressed: ()async{
+                await _toggleChannel("",0);
+                Navigator.pop(context);
+
+              },
               elevation:20.0,
               shape: CircleBorder(side: BorderSide(color:Colors.red)),
               mini:false,
-              child: Icon(Icons.call_end, color: Colors.red,),
+              child: remoteUsers.length>0?Icon(Icons.call_end, color: Colors.red,):Icon(Icons.call_end, color: Colors.green,),
               backgroundColor: Colors.red[100],
             )
           ],
@@ -139,6 +140,88 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
     );
 
   }
+  void dispose() {
+    // clear users
+    // destroy sdk
+    AgoraRtcEngine.leaveChannel();
+    _timerInstance.cancel();
+    AgoraRtcEngine.destroy();
+    super.dispose();
+
+  }
+
+  Future<void> _initAgoraRtcEngine() async {
+    AgoraRtcEngine.create(StringConstants.agora_app_id);
+    AgoraRtcEngine.enableAudio();
+    AgoraRtcEngine.setParameters('{\"che.video.lowBitRateStreamParameter\":{\"width\":320,\"height\":180,\"frameRate\":15,\"bitRate\":140}}');
+    AgoraRtcEngine.setChannelProfile(ChannelProfile.Communication);
+//    AgoraRtcEngine.setParameters("{\"rtc.log_filter\": 65535}");
+
+  }
+
+  void _addAgoraEventHandlers() {
+    AgoraRtcEngine.onJoinChannelSuccess =
+        (String channel, int uid, int elapsed) {
+      setState(() {
+        String info = 'onJoinChannel: ' + channel + ', uid: ' + uid.toString();
+        infoStrings.add(info);
+      });
+
+
+    };
+
+    AgoraRtcEngine.onLeaveChannel = () {
+      setState(() {
+        infoStrings.add('onLeaveChannel');
+        remoteUsers.clear();
+      });
+    };
+
+    AgoraRtcEngine.onUserJoined = (int uid, int elapsed) {
+
+      setState(() {
+        String info = 'userJoined: ' + uid.toString();
+        infoStrings.add(info);
+        remoteUsers.add(uid);
+      });
+
+    };
+
+    AgoraRtcEngine.onUserOffline = (int uid, int reason) {
+
+      setState(() {
+        String info = 'userOffline: ' + uid.toString();
+        infoStrings.add(info);
+        remoteUsers.remove(uid);
+      });
+    };
+  }
+
+  void _toggleChannel(url,receiver_id)async {
+
+      if (isInChannel) {
+
+        await AgoraRtcEngine.leaveChannel();
+        _timerInstance.cancel();
+        setState(() {
+          isInChannel = false;
+        });
+
+      } else {
+
+        await AgoraRtcEngine.joinChannel(null, url+'_call_'+receiver_id.toString(), null, 0);
+        setState(() {
+          isInChannel = true;
+        });
+      }
+
+
+  }
+
+
+
+
+
 }
 
 class FunctionalButton extends StatefulWidget {

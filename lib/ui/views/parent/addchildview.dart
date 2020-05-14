@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tunza_app/core/enums/viewstate.dart';
+import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/viewmodels/parent/child_model.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
 
 class AddChildView extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
-  var txt = TextEditingController();
+  Child child;
   String _name;
   String _date_of_birth;
-  final String pageText;
-  AddChildView(this.pageText);
+  var txt;
+  AddChildView(args){
+    this.child=args.length>0?args[0]:null;
+    this.txt=TextEditingController(text: this.child!=null?this.child.child_date_of_birth:null);
+  }
   @override
   Widget build(BuildContext context) {
     return BaseView<ChildModel>(
       builder: (context, model, child){
         return Scaffold(
-          appBar: new AppBar(title: new Text(pageText),),
+          appBar: new AppBar(title: new Text("Child details"),),
           body: new Center(
             child: SingleChildScrollView(
                 child: Form(
@@ -38,6 +42,7 @@ class AddChildView extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0,horizontal: 16.0),
                         child: TextFormField(
+                          initialValue: this.child!=null?this.child.child_name:null,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.child_care),
                             labelText: 'Childs Name',
@@ -88,12 +93,12 @@ class AddChildView extends StatelessWidget {
                         child: model.state==ViewState.Busy?
                         CircularProgressIndicator():
                         MaterialButton(
-                          child: Text ('Register'),
+                          child: Text ('Submit'),
                           color: Colors.blueGrey,
                           onPressed: ()async{
                             if(formKey.currentState.validate()){
                               formKey.currentState.save();
-                              var success = await model.addChild(_name, _date_of_birth);
+                              var success = this.child==null?await model.addChild(_name, _date_of_birth):await model.editChild(this.child.child_id,_name, _date_of_birth);
                               if(success){
                                 formKey.currentState.reset();
                                 txt=TextEditingController(text: "");

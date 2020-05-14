@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tunza_app/core/enums/viewstate.dart';
+import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/viewmodels/parent/singlechildmodel.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
@@ -32,7 +33,7 @@ class CaregiverSingleChildView extends StatelessWidget {
 //                    Navigator.pushReplacementNamed(context, "caregivers",arguments: this.child);
 //                    break;
                   case 1:
-                    Navigator.pushReplacementNamed(context, "communication",arguments: this.child);
+                    Navigator.pushReplacementNamed(context, "communication",arguments: [this.child,Role.Caregiver]);
                     break;
                 }
               },
