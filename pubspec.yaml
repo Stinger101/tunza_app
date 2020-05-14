@@ -38,6 +38,7 @@ dependencies:
   flutter_local_notifications: 1.4.2
   rxdart: 0.24.0
   agora_rtc_engine: 1.0.11
+  retry: 3.0.0+1
 
 dev_dependencies:
   flutter_test:

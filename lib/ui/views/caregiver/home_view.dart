@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:tunza_app/core/enums/viewstate.dart';
+import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/viewmodels/caregiver/home_model.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
 import 'package:tunza_app/ui/views/caregiver/childlist_view.dart';
@@ -30,7 +31,7 @@ class _CaregiverHomeViewState extends State<CaregiverHomeView>{
               IconButton(icon: Icon(Icons.search), onPressed: 
                 
                 () {
-          showSearch(context: context, delegate: AppSearch());
+          showSearch(context: context, delegate: AppSearch(model.childList));
           }
             
 
@@ -152,87 +153,77 @@ class _CaregiverHomeViewState extends State<CaregiverHomeView>{
 
 }
 class AppSearch extends SearchDelegate<String>{
-
-final cities = [
-"Otse",
-"Kanye",
-"Lobatse",
-"Ramotswa",
-"Zilapo"
-];
- final recentCities =[
-  "Otse",
- "Kanye" 
- ];
-
+  List<Child> childList=[];
+  final recentSearch =[];
+  AppSearch(this.childList);
   @override
   List<Widget> buildActions(BuildContext context) {
     //what kind of actions do i want to perform
 
     return [IconButton(
-      icon: Icon(Icons.clear), 
-      onPressed: () {
-            query="";
-      }
-      )
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query="";
+        }
+    )
     ];
   }
-  
+
 
   @override
   Widget buildLeading(BuildContext context) {
     // leading icon on the left of the app bar
     return IconButton(icon: AnimatedIcon(
-      icon: AnimatedIcons.menu_arrow, 
+      icon: AnimatedIcons.menu_arrow,
       progress: transitionAnimation,
-      ),
-      onPressed: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => CaregiverHomeView())
-      
-      ));
+    ),
+        onPressed: () => Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => CaregiverHomeView())
+
+        ));
   }
 
   @override
   Widget buildResults(BuildContext context) {
     // TODO: implement buildResults
     return Center(
-      child: Container(
-        height: 100.0,
-        width: 100.0,
-        child: Card(
-          color: Colors.red,
-          child: Center(
-            child: Text(query),
-          )
-        ),
-      )
+        child: Container(
+          height: 100.0,
+          width: 100.0,
+          child: Card(
+              color: Colors.red,
+              child: Center(
+                child: Text(query),
+              )
+          ),
+        )
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     // give suggestions whan someone searches something
-    final suggestionList = query.isEmpty ? recentCities : cities.where((p)=>p.startsWith(query)).toList();
-    return ListView.builder(
-      itemBuilder:(context, index) => ListTile(
-        onTap: (){
-          showResults(context);
-        },
-        leading: Icon(Icons.location_city),
-        title: RichText(
-          text: TextSpan(
-            text: suggestionList[index].substring(0, query.length),
-            style: TextStyle(
-              color: Colors.black,fontWeight: FontWeight.bold
-            ),
-            children: [TextSpan(
-              text: suggestionList[index].substring(query.length),
-              style: TextStyle(color: Colors.grey)
-            )]
-          )
+    final suggestionList = query.isEmpty ? recentSearch : this.childList.where((p)=>p.child_name.startsWith(query)).toList();
+    return ListView.builder(itemCount:suggestionList.length ,itemBuilder: (context,i){
+
+      return Card(
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQOL0wCKxBI3i8-S8OnckAeaszWpVHziXKSnzBRNuABcKZw66M-&usqp=CAU"),
+          ),
+          title: Text(suggestionList[i].child_name),
+          subtitle: Text(suggestionList[i].child_date_of_birth),
+          trailing: Icon(Icons.remove_red_eye,size: 16),
+          onLongPress: ()async{
+            //@todo: edit delete stuff here
+
+          },
+          onTap: (){
+
+            Navigator.pushReplacementNamed(context, "child",arguments:suggestionList[i]);
+          },
         ),
-        ),
-        itemCount: suggestionList.length,
-    );
+      );
+    });
   }
 
 }

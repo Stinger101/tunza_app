@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tunza_app/core/enums/viewstate.dart';
+import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/viewmodels/communication/communication_model.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
@@ -8,7 +9,11 @@ import 'package:tunza_app/ui/views/parent/singlepostview.dart';
 
 class CommunicationView extends StatelessWidget{
   Child child;
-  CommunicationView(this.child);
+  Role role;
+  CommunicationView(args){
+    this.child=args[0];
+    this.role=args.length>1?args[1]:Role.Parent;
+  }
 
   @override
 
@@ -21,19 +26,24 @@ class CommunicationView extends StatelessWidget{
         return Scaffold(
           appBar: new AppBar(title: new Text("Posts - "+this.child.child_name),),
           bottomNavigationBar: BottomNavigationBar(
-            items: [
+            items: this.role==Role.Parent?[
+
               BottomNavigationBarItem(icon: Icon(Icons.receipt),title: Text("General")),
               BottomNavigationBarItem(icon: Icon(Icons.child_friendly),title: Text("Caregivers")),
               BottomNavigationBarItem(icon: Icon(Icons.content_paste),title:Text("Posts")),
+            ]:[
+
+              BottomNavigationBarItem(icon: Icon(Icons.receipt),title: Text("General")),
+              BottomNavigationBarItem(icon: Icon(Icons.content_paste),title:Text("Posts")),
             ],
-            currentIndex: 2,
+            currentIndex: this.role==Role.Parent?2:1,
             onTap: (i){
               switch(i){
                 case 0:
-                  Navigator.pushReplacementNamed(context, "child",arguments: this.child);
+                  Navigator.pushReplacementNamed(context, this.role==Role.Parent?"child":"caregiver_child_view",arguments: this.child);
                   break;
                 case 1:
-                  Navigator.pushReplacementNamed(context, "caregivers",arguments: this.child);
+                  this.role==Role.Parent?Navigator.pushReplacementNamed(context, "caregivers",arguments: this.child):null;
                   break;
                 case 2:
                   break;
@@ -92,7 +102,7 @@ class CommunicationView extends StatelessWidget{
                                       ),
                                       onTap: (){
                                         //todo: go to next page with child and post
-                                        Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => SinglePostView([this.child,model.postList[i]])));
+                                        Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => SinglePostView([this.child,model.postList[i],this.role])));
                                       },
                                     ),
                                   ),

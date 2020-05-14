@@ -39,15 +39,8 @@ class VideoCallView extends StatelessWidget{
       builder: (context,model,child){
         return Scaffold(
             appBar: new AppBar(title: new Text("Video call"),),
-            floatingActionButton: FloatingActionButton(
-              child: model.isInChannel?Icon(Icons.call_end):Icon(Icons.group_add),
-              onPressed: (){
-                model.isInChannel?_toggleChannel("",0)
-                    :Navigator.pushNamed(context, "login");
-              },
-            ),
             body:  model.isInChannel?
-            _viewRows():null,
+            _viewRows(context):null,
         );
       },
       dispose: dispose,
@@ -136,21 +129,45 @@ class VideoCallView extends StatelessWidget{
     model.setState(ViewState.Idle);
   }
 
-  Widget _viewRows() {
-    return Row(
+  Widget _viewRows(context) {
+    return Stack(
       children: <Widget>[
         for (final widget in _renderWidget)
           Expanded(
             child: Container(
               child: widget,
             ),
-          )
+          ),
+        _renderWidget.length<1?AgoraRenderWidget(0, local: true, preview: true)
+        :Positioned(
+          right: 24.0,
+          bottom: 24.0,
+          child:Container(
+              height: MediaQuery.of(context).size.height*0.2,
+              width: MediaQuery.of(context).size.width*0.2,
+              child:AgoraRenderWidget(0, local: true, preview: true)
+          ),
+        ),
+        Align(
+          alignment: FractionalOffset.bottomCenter,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: model.isInChannel?FloatingActionButton(
+              child: Icon(Icons.call_end),
+              onPressed: (){
+                  _toggleChannel("",0);
+                  Navigator.pushNamed(context, "login");
+              },
+            ):null,
+          ),
+        ),
+
       ],
     );
   }
 
   Iterable<Widget> get _renderWidget sync* {
-    yield AgoraRenderWidget(0, local: true, preview: false);
+
 
     for (final uid in model.remoteUsers) {
       yield AgoraRenderWidget(uid);

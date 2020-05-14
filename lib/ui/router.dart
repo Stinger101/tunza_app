@@ -36,7 +36,7 @@ class Router{
         return MaterialPageRoute(builder:(_)=>ProfilePage("My profile"));
         break;
       case "add_child":
-        return MaterialPageRoute(builder: (_)=>AddChildView("Child"));
+        return MaterialPageRoute(builder: (_)=>AddChildView(settings.arguments));
         break;
       case "child":
         return MaterialPageRoute(builder: (_)=>SingleChildView(settings.arguments));

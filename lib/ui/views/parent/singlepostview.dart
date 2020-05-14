@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/viewmodels/communication/singlepost_model.dart';
 import 'package:tunza_app/core/models/post.dart';
 import 'package:tunza_app/core/models/child.dart';
@@ -9,9 +10,11 @@ import 'package:tunza_app/ui/views/parent/addcomment_view.dart';
 class SinglePostView extends StatelessWidget{
   Post post;
   Child child;
+  Role role;
   SinglePostView(args){
     this.child=args[0];
     this.post=args[1];
+    this.role=args.length>2?args[2]:Role.Parent;
   }
   @override
   Widget build(BuildContext context) {
@@ -55,7 +58,7 @@ class SinglePostView extends StatelessWidget{
                             onTap: (){
 
                               //todo: go to next page with child and post
-                              Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => AddCommentView([this.child,this.post])));
+                              Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => AddCommentView([this.child,this.post,null,this.role])));
                             },
                           ),
                         ),

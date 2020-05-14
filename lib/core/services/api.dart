@@ -9,6 +9,7 @@ import 'package:tunza_app/core/models/invite.dart';
 import 'package:tunza_app/core/models/profile.dart';
 import 'dart:async';
 import 'dart:io';
+import 'package:retry/retry.dart';
 
 import 'package:tunza_app/core/models/user.dart';
 import 'package:tunza_app/core/models/post.dart';
@@ -84,8 +85,11 @@ class Api{
 
   Future <List<Child>> fetchChildren()async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/children",
+    var res = await retry(
+          ()=>client.get("$url/user/children",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+        ),
+      retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     if(res.statusCode==200){
 
@@ -139,8 +143,9 @@ class Api{
 
   Future<List<Category>> fetchCategories()async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/categories",
+    var res = await retry(()=> client.get("$url/user/categories",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     if(res.statusCode==200){
       List data=json.decode(res.body);
@@ -158,8 +163,9 @@ class Api{
   }
   Future<List> fetchRawCategories()async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/categories",
+    var res = await retry(()=>client.get("$url/user/categories",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException,
     );
     if(res.statusCode==200){
       List data=json.decode(res.body);
@@ -184,8 +190,10 @@ class Api{
   //todo: fetch list of caregivers in a category and check children assigned to them
   Future<List<Caregiver>> fetchCaregivers(child_id)async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/child/$child_id/caregivers",
+    var res = await retry(()=>client.get("$url/user/child/$child_id/caregivers",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),
+      retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     print(res.body);
     if(res.statusCode==200){
@@ -226,8 +234,11 @@ class Api{
 
   Future <List<Child>> fetchCaregiverChildren()async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/caregiver/children",
+    var res = await retry(
+            ()=>client.get("$url/caregiver/children",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+        ),
+      retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     if(res.statusCode==200){
       List data=json.decode(res.body);
@@ -242,8 +253,9 @@ class Api{
   }
   Future<List<Invite>> fetchInvites()async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/caregiver/invites",
+    var res = await retry(()=>client.get("$url/caregiver/invites",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     if(res.statusCode==200){
       List data=json.decode(res.body);
@@ -296,8 +308,9 @@ class Api{
   }
   Future<List<Info>> fetchChildInfo(child_id)async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/child/$child_id/basicinfos",
+    var res = await retry(()=>client.get("$url/user/child/$child_id/basicinfos",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException,
     );
     if(res.statusCode==200){
       List data=json.decode(res.body);
@@ -364,8 +377,9 @@ class Api{
   }
   Future<List<Post>> fetchPosts(child_id)async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/child/$child_id/topics",
+    var res = await retry(()=>client.get("$url/user/child/$child_id/topics",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     print(res.body);
     if(res.statusCode==200){
@@ -420,8 +434,9 @@ class Api{
   }
   Future<List<Comment>> fetchComments(topic_id,child_id)async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.get("$url/user/child/$child_id/topic/$topic_id/comments",
+    var res = await retry(()=>client.get("$url/user/child/$child_id/topic/$topic_id/comments",
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
+    ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
     print(res.body);
     if(res.statusCode==200){

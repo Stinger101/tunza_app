@@ -1,0 +1,4 @@
+enum CallMode{
+  Audio,
+  Video
+}

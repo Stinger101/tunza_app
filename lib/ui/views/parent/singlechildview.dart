@@ -32,7 +32,7 @@ class SingleChildView extends StatelessWidget {
                     Navigator.pushReplacementNamed(context, "caregivers",arguments: this.child);
                     break;
                   case 2:
-                    Navigator.pushReplacementNamed(context, "communication",arguments: this.child);
+                    Navigator.pushReplacementNamed(context, "communication",arguments: [this.child]);
                     break;
                 }
               },

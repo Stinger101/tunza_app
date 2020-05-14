@@ -12,4 +12,10 @@ class ChildModel extends BaseModel{
     setState(ViewState.Idle);
     return success;
   }
+  editChild(child_id,String name,String date_of_birth)async{
+    setState(ViewState.Busy);
+    var success = await _api.editChild(child_id,name,date_of_birth);
+    setState(ViewState.Idle);
+    return success;
+  }
 }
