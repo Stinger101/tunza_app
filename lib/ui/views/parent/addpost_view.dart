@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tunza_app/core/enums/viewstate.dart';
 import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/models/post.dart';
 import 'package:tunza_app/core/viewmodels/communication/addpost_model.dart';
@@ -13,6 +14,7 @@ class AddPostView extends StatelessWidget{
   var _question;
   var _visibility = true;
   var _visibility_val = 1;
+  bool isTextual=true;
   AddPostView(args){
     this.child=args[0];
     this.post=args.length>1?args[1]:null;
@@ -33,6 +35,19 @@ class AddPostView extends StatelessWidget{
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        IconButton(icon: Icon(Icons.receipt,color: isTextual?Colors.blueGrey:null),onPressed: (){
+                          isTextual=true;
+                          model.setState(ViewState.Idle);
+                        },),
+                        IconButton(icon: Icon(Icons.burst_mode,color: isTextual?null:Colors.blueGrey),onPressed: (){
+                          isTextual=false;
+                          model.setState(ViewState.Idle);
+                        },),
+                      ],
+                    ),
                     TextFormField(
                       initialValue: this.post!=null?post.topic:null,
                       minLines: 4,

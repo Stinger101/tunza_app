@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tunza_app/core/services/notification_service.dart';
 import 'package:tunza_app/core/viewmodels/base_model.dart';
 import 'package:tunza_app/locator.dart';
+import 'package:tunza_app/ui/views/communication/call.dart';
 
 class BaseView<T extends BaseModel> extends StatefulWidget{
   final Widget Function(BuildContext context,T model, Widget child) builder;
@@ -64,7 +65,12 @@ class _BaseViewState<T extends BaseModel> extends State<BaseView<T>>{
   void _configureSelectNotificationSubject() {
 
     asns= model.notificationService.selectNotificationSubject.stream.listen((String payload) async {
-      await Navigator.pushNamed(context, "videocall_view",arguments: payload);//todo: replace this with call page
+      if(payload.split("!")[2]=="video"){
+        await Navigator.pushNamed(context, "videocall_view",arguments: payload);//todo: replace this with call page
+      }else{
+        await Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VoiceCallPage(payload)));
+      }
+
     });
   }
   @override

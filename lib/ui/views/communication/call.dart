@@ -5,11 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:tunza_app/res/strings.dart';
 
 class VoiceCallPage extends StatefulWidget {
-  final String call_url;
-  final int receiver_id;
-  final String mode;//receiving or calling
+   String call_url;
+   int receiver_id;
+   String mode;//receiving or calling
+   int call_status=1;//call waiting,call ongoing, call ended
 
-  VoiceCallPage(this.call_url,this.receiver_id,this.mode);
+  VoiceCallPage(arg){
+    var ls=arg.split("!");
+    this.call_url=ls[0];
+    this.receiver_id=int.parse(ls[1]);
+    this.mode=ls[2];
+  }
   @override
   _VoiceCallPageState createState() => _VoiceCallPageState();
 }
@@ -22,6 +28,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
   final infoStrings=<String>[];
   final remoteUsers = <int>[];
   bool isInChannel = false;
+  bool onSpeaker=false;
 
   void startTimer(){
     var onSec = Duration(seconds: 1);
@@ -92,7 +99,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
             ),
             SizedBox(height: 15.0,),
             Text(
-              'Calling...',
+              widget.call_status==1?'Calling...':widget.call_status==2?"Connected":"Call ended",
               style: TextStyle(
                   color: Colors.blueGrey,
                   fontWeight: FontWeight.w300,
@@ -114,7 +121,9 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                FunctionalButton(title: 'speaker', icon: Icons.phone_in_talk, onPressed: (){},),
+                FunctionalButton(title: 'speaker', icon: Icons.phone_in_talk, onPressed: (){
+                  AgoraRtcEngine.setEnableSpeakerphone(!onSpeaker);
+                },),
                 FunctionalButton(title: 'video call', icon: Icons.videocam, onPressed: (){},),
                 FunctionalButton(title: 'mute', icon: Icons.mic_off, onPressed: (){},),
               ],
@@ -125,6 +134,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
             FloatingActionButton(
               onPressed: ()async{
                 await _toggleChannel("",0);
+                widget.call_status=3;
                 Navigator.pop(context);
 
               },
@@ -165,6 +175,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
       setState(() {
         String info = 'onJoinChannel: ' + channel + ', uid: ' + uid.toString();
         infoStrings.add(info);
+
       });
 
 
@@ -174,6 +185,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
       setState(() {
         infoStrings.add('onLeaveChannel');
         remoteUsers.clear();
+        widget.call_status=3;
       });
     };
 
@@ -183,6 +195,9 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
         String info = 'userJoined: ' + uid.toString();
         infoStrings.add(info);
         remoteUsers.add(uid);
+        _start=0;
+        _timer='';
+        widget.call_status=2;
       });
 
     };
@@ -193,6 +208,11 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
         String info = 'userOffline: ' + uid.toString();
         infoStrings.add(info);
         remoteUsers.remove(uid);
+        AgoraRtcEngine.leaveChannel();
+        _timerInstance.cancel();
+        widget.call_status=3;
+        AgoraRtcEngine.destroy();
+        Navigator.pop(context);
       });
     };
   }

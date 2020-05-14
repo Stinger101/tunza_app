@@ -110,7 +110,7 @@ class CaregiverView extends StatelessWidget{
                                                     model.caregiverList[i].caregiver_user_id,
                                                     "voice");
                                                 // todo: add navigation to call page
-                                                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VoiceCallPage(url,model.caregiverList[i].caregiver_user_id,"calling")));
+                                                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VoiceCallPage(url+"!"+model.caregiverList[i].caregiver_user_id.toString()+"!"+"voice")));
                                               }
                                             },
                                             ),
