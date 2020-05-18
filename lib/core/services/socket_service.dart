@@ -74,7 +74,7 @@ class SocketService{
       callController.add(Call.fromJson(call));
       print(call);
       Call rec_call=Call.fromJson(call);
-      _notificationService.showNotification(call["id"], call['call_type'], call['call_type'],rec_call.call_url+"!"+rec_call.receiver_id+"!"+call['call_type']);
+      _notificationService.showNotification(call["id"], call['call_type'], call['call_type'],rec_call.call_url+"!"+rec_call.receiver_id+"!"+call['call_type']+"!"+call['receiver']["name"]);
     });
   }
 

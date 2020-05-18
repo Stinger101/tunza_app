@@ -5,9 +5,9 @@ import 'package:tunza_app/locator.dart';
 
 class AddPostModel extends BaseModel{
   Api _api=locator<Api>();
-  addPost(child_id,topic)async{
+  addPost(child_id,topic,{attachment,attachment_type})async{
     setState(ViewState.Busy);
-    var success = await _api.addPost(child_id, topic);
+    var success = await _api.addPost(child_id, topic,attachment:attachment,attachment_type: attachment_type);
     setState(ViewState.Idle);
     return success;
   }

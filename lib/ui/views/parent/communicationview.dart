@@ -4,12 +4,15 @@ import 'package:tunza_app/core/enums/viewstate.dart';
 import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/models/child.dart';
 import 'package:tunza_app/core/viewmodels/communication/communication_model.dart';
+import 'package:tunza_app/res/strings.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
 import 'package:tunza_app/ui/views/parent/singlepostview.dart';
+import 'package:video_player/video_player.dart';
 
 class CommunicationView extends StatelessWidget{
   Child child;
   Role role;
+
   CommunicationView(args){
     this.child=args[0];
     this.role=args.length>1?args[1]:Role.Parent;
@@ -61,7 +64,7 @@ class CommunicationView extends StatelessWidget{
                     hintText: "Whats on your mind?"
                 ),
                 onTap: (){
-                  Navigator.pushNamed(context, "add_post",arguments: [this.child]);
+                  Navigator.pushNamed(context, "add_post",arguments: [this.child,this.role]);
                 },
                 readOnly: true,
               ),
@@ -71,6 +74,11 @@ class CommunicationView extends StatelessWidget{
               Expanded(
                 child: RefreshIndicator(
                   child: ListView.builder(itemCount:model.postList.length,itemBuilder: (context,i){
+                    VideoPlayerController controller;
+                    Future controllerInitialize;
+                    controller=model.postList[i].attachment_url!=null&&model.postList[i].attachment_type=="video"?VideoPlayerController.network(StringConstants.url+model.postList[i].attachment_url+"?api_token=${model.currentUser.user_token}"):null;
+                    controllerInitialize=model.postList[i].attachment_type=="video"?controller.initialize():null;
+//                    model.postList[i].attachment_type=="video"?controller.setLooping(true):null;
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -82,6 +90,65 @@ class CommunicationView extends StatelessWidget{
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text("${model.postList[i].topic}"),
+                              model.postList[i].attachment_url!=null?(
+                                  model.postList[i].attachment_type=="image"?
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Image.network(StringConstants.url+model.postList[i].attachment_url,height: MediaQuery.of(context).size.height*0.2,headers: {"Authorization":"Bearer ${model.currentUser.user_token}"})
+                                    ],
+                                  ):
+                                  FutureBuilder(
+                              future: controllerInitialize,
+                              builder: (context,snapshot){
+                                if(snapshot.connectionState==ConnectionState.done){
+                                  return Container(
+                                    height: MediaQuery.of(context).size.height*0.2,
+                                    child: Stack(
+                                      children: <Widget>[
+                                        Align(
+                                          child: AspectRatio(
+                                            aspectRatio: controller.value.aspectRatio,
+                                            child: VideoPlayer(controller),
+                                          ),
+                                          alignment: Alignment.center,
+                                        ),
+                                        Container(
+
+                                          alignment:FractionalOffset.center,
+                                          child: Center(
+                                            child: FloatingActionButton(
+                                              onPressed: () {
+                                                controller.value.duration==controller.value.position?controller.seekTo(Duration(seconds: 0)):null;
+                                                !controller.value.isPlaying?controller.play():controller.pause();
+
+//                                                model.setState(ViewState.Idle);
+
+                                              },
+
+                                              child: Icon(
+                                                Icons.play_arrow,
+                                              ),
+                                              mini: true,
+                                              backgroundColor: Colors.transparent,
+                                              foregroundColor: Colors.transparent,
+                                              heroTag:model.postList[i].id.toString(),
+                                            ),
+                                          ),
+                                          height: MediaQuery.of(context).size.height*0.2,
+
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
+                                else{
+                                  return Center(child: CircularProgressIndicator(),);
+                                }
+                              },
+                            ))
+                                  : Container(),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
