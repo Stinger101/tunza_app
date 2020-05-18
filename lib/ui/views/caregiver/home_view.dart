@@ -86,15 +86,15 @@ class _CaregiverHomeViewState extends State<CaregiverHomeView>{
                       Navigator.pushNamed(context, "view_invites");
                     }
                 ),
-                Divider(),
-                ListTile(
-                    title: Text('Appointments'),
-                    trailing: Icon(Icons.access_time),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.pushNamed(context, "appointments");
-                    }
-                ),
+//                Divider(),
+//                ListTile(
+//                    title: Text('Appointments'),
+//                    trailing: Icon(Icons.access_time),
+//                    onTap: () {
+//                      Navigator.of(context).pop();
+//                      Navigator.pushNamed(context, "appointments");
+//                    }
+//                ),
                 Divider(),
                 ListTile(
                     title: Text('Logout'),

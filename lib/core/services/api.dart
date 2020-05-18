@@ -341,7 +341,9 @@ class Api{
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"},
         body:{"call_url":call_url,"receiver_id":receiver_id.toString(),"call_type":call_type}
     );
+    print("skks");
     print(res.body);
+    print("werrr");
     if(res.statusCode!=500){
       return true;
     }else{
@@ -349,16 +351,22 @@ class Api{
       return false;
     }
   }
-  Future<bool> addPost(child_id,topic)async{
+  Future<bool> addPost(child_id,topic,{attachment,attachment_type})async{
     AuthenticationService _authenticationService=locator<AuthenticationService>();
-    var res = await client.post("$url/user/child/$child_id/add_topic",
-        headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"},
-        body: {"topic":topic}
+    FormData formData=new FormData.fromMap({
+      "topic":topic,
+      "attachment_type":attachment_type,
+      "attachment":await MultipartFile.fromFile(attachment,filename: attachment.split('/').last)
+    });
+    dio.options.headers["Authorization"]="Bearer ${_authenticationService.currentUser.user_token}";
+    var res = await dio.post("$url/user/child/$child_id/add_topic",
+        data: formData,
+
     );
-    if(res.statusCode==201){
+    if(res.statusCode!=500){
       return true;
     }else{
-      print(res.body);
+      print(res.data);
       return false;
     }
   }
@@ -381,10 +389,11 @@ class Api{
         headers: {"Authorization":"Bearer ${_authenticationService.currentUser.user_token}"}
     ),retryIf: (e)=>e is SocketException || e is TimeoutException || e is http.ClientException
     );
-    print(res.body);
+//    print(res.body);
     if(res.statusCode==200){
       List data=json.decode(res.body);
       var posts=List.generate(data.length, (i){
+        print(data[i]);
         return Post.fromJson(data[i]);
       });
       return posts;

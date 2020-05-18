@@ -4,13 +4,18 @@ import 'package:tunza_app/core/enums/role.dart';
 import 'package:tunza_app/core/viewmodels/communication/singlepost_model.dart';
 import 'package:tunza_app/core/models/post.dart';
 import 'package:tunza_app/core/models/child.dart';
+import 'package:tunza_app/res/strings.dart';
 import 'package:tunza_app/ui/views/base_view.dart';
 import 'package:tunza_app/ui/views/parent/addcomment_view.dart';
+import 'package:video_player/video_player.dart';
 
 class SinglePostView extends StatelessWidget{
   Post post;
   Child child;
   Role role;
+  VideoPlayerController controller;
+  Future controllerInitialize;
+
   SinglePostView(args){
     this.child=args[0];
     this.post=args[1];
@@ -21,6 +26,8 @@ class SinglePostView extends StatelessWidget{
     // TODO: implement build
     return BaseView<SinglePostModel>(
       onModelReady: (model)async{
+        controller=post.attachment_url!=null&&post.attachment_type=="video"?VideoPlayerController.network(StringConstants.url+post.attachment_url+"?api_token=${model.currentUser.user_token}"):null;
+        controllerInitialize=post.attachment_type=="video"?controller.initialize():null;
         await model.fetchComments(this.post.id, this.child.child_id);
       },
       builder:(context,model,child){
@@ -40,6 +47,65 @@ class SinglePostView extends StatelessWidget{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(post.topic),
+                    post.attachment_url!=null?(
+                        post.attachment_type=="image"?
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.network(StringConstants.url+post.attachment_url,height: MediaQuery.of(context).size.height*0.2,headers: {"Authorization":"Bearer ${model.currentUser.user_token}"})
+                          ],
+                        ):
+                        FutureBuilder(
+                          future: controllerInitialize,
+                          builder: (context,snapshot){
+                            if(snapshot.connectionState==ConnectionState.done){
+                              return Container(
+                                height: MediaQuery.of(context).size.height*0.4,
+                                child: Stack(
+                                  children: <Widget>[
+                                    Align(
+                                      child: AspectRatio(
+                                        aspectRatio: controller.value.aspectRatio,
+                                        child: VideoPlayer(controller),
+                                      ),
+                                      alignment: Alignment.center,
+                                    ),
+                                    Container(
+
+                                      alignment:FractionalOffset.center,
+                                      child: Center(
+                                        child: FloatingActionButton(
+                                          onPressed: () {
+                                            controller.value.duration==controller.value.position?controller.seekTo(Duration(seconds: 0)):null;
+                                            !controller.value.isPlaying?controller.play():controller.pause();
+
+//                                                model.setState(ViewState.Idle);
+
+                                          },
+
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                          ),
+                                          mini: true,
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: Colors.transparent,
+                                          heroTag:post.id.toString(),
+                                        ),
+                                      ),
+                                      height: MediaQuery.of(context).size.height*0.2,
+
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                            else{
+                              return Center(child: CircularProgressIndicator(),);
+                            }
+                          },
+                        ))
+                        : Container(),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

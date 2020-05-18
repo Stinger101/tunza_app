@@ -7,6 +7,7 @@ import 'package:tunza_app/res/strings.dart';
 class VoiceCallPage extends StatefulWidget {
    String call_url;
    int receiver_id;
+   String receiver_name;
    String mode;//receiving or calling
    int call_status=1;//call waiting,call ongoing, call ended
 
@@ -15,6 +16,7 @@ class VoiceCallPage extends StatefulWidget {
     this.call_url=ls[0];
     this.receiver_id=int.parse(ls[1]);
     this.mode=ls[2];
+    this.receiver_name=ls[3];
   }
   @override
   _VoiceCallPageState createState() => _VoiceCallPageState();
@@ -72,7 +74,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
     var clipRRect = ClipRRect(
       borderRadius: BorderRadius.circular(200.0),
       child: Image.network(
-        'https://avatars0.githubusercontent.com/u/1515991?s=400&u=992d9ed72113954c22d87d6185064027bc600c51&v=4',
+        StringConstants.missing_avatar_url,
         height: 100,
         width: 100,
       ),
@@ -91,7 +93,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 15.0,),
-            Text('Santosh Rampu',
+            Text(widget.receiver_name,
               style: TextStyle(
                   color: Colors.blueGrey,
                   fontWeight: FontWeight.w900,
