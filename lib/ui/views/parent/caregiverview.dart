@@ -1,6 +1,7 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tunza_app/core/enums/viewstate.dart';
 import 'package:tunza_app/core/models/caregiver.dart';
 import 'package:tunza_app/core/models/child.dart';
@@ -105,12 +106,18 @@ class CaregiverView extends StatelessWidget{
                                               if(model.caregiverList[i].caregiver_user_id!=null) {
                                                 print(model.caregiverList[i].caregiver_user_id);
                                                 String url=DateTime.now().toIso8601String();
-                                                await model.makeCall(
-                                                    url,
-                                                    model.caregiverList[i].caregiver_user_id,
-                                                    "voice");
-                                                // todo: add navigation to call page
-                                                Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VoiceCallPage(url+"!"+model.caregiverList[i].caregiver_user_id.toString()+"!"+"voice"+"!"+model.caregiverList[i].email_provided)));
+                                                if(await Permission.camera.isGranted && await Permission.camera.isGranted){
+                                                  await model.makeCall(
+                                                      url,
+                                                      model.caregiverList[i].caregiver_user_id,
+                                                      "voice");
+                                                  // todo: add navigation to call page
+                                                  Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VoiceCallPage(url+"!"+model.caregiverList[i].caregiver_user_id.toString()+"!"+"voice"+"!"+model.caregiverList[i].email_provided)));
+                                                }else{
+                                                  await [Permission.camera,Permission.microphone].request();
+
+                                                }
+
                                               }
                                             },
                                             ),
@@ -120,13 +127,17 @@ class CaregiverView extends StatelessWidget{
 
                                                   String url=DateTime.now().toIso8601String();
                                                   this.currentCaregiver=model.caregiverList[i];
-                                                  await model.makeCall(
-                                                      url,
-                                                      model.caregiverList[i].caregiver_user_id,
-                                                      "video");
-                                                  Navigator.pop(context);
-                                                  Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VideoCallView(url+"!"+model.caregiverList[i].caregiver_user_id.toString())));
+                                                  if(await Permission.camera.isGranted && await Permission.camera.isGranted){
+                                                    await model.makeCall(
+                                                        url,
+                                                        model.caregiverList[i].caregiver_user_id,
+                                                        "video");
+                                                    Navigator.pop(context);
+                                                    Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => VideoCallView(url+"!"+model.caregiverList[i].caregiver_user_id.toString())));
+                                                  }else{
+                                                    await [Permission.camera,Permission.microphone].request();
 
+                                                  }
                                                 }
                                               },),
                                             IconButton(icon: Icon(Icons.chat),),

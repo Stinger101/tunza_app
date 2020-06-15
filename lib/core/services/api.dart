@@ -93,7 +93,7 @@ class Api{
     );
     if(res.statusCode==200){
 
-      List data=json.decode(res.body);
+      List data=json. decode(res.body);
       var children=List.generate(data.length, (i){
         return Child.fromJson(data[i]);
       });
